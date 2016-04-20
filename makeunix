@@ -1,0 +1,74 @@
+TARGET=LINUX
+#TARGET=DJGPP
+#TARGET=ALPHA
+#TARGET=SUN
+
+CXX=gcc
+DEST=amp11
+L=g++
+LFLAGS=-s
+
+ifeq ($(TARGET),LINUX)
+TARGETFLAGS=-DFASTBITS -DGNUCI486 -DTIME -DUNIX -DLINUX -Wall -O2 -m486 -fomit-frame-pointer -funroll-all-loops -finline-functions -ffast-math
+TARGETOBJS=binfpllx.o
+TARGETDEPS=binfpllx.h
+endif
+ifeq ($(TARGET),ALPHA)
+TARGETFLAGS=-DALPHA -DTIME -DUNIX -Wall -O2 -fomit-frame-pointer -funroll-all-loops -finline-functions -ffast-math
+endif
+ifeq ($(TARGET),SUN)
+TARGETFLAGS=-DSUNOS4 -DTIME -DBIGENDIAN -DUNIX -Wall -O2 -fomit-frame-pointer -funroll-all-loops -finline-functions -ffast-math
+endif
+ifeq ($(TARGET),DJGPP)
+TARGETOBJS=binfplsb.o
+TARGETDEPS=binfplsb.h
+TARGETFLAGS=-DMSIBM -DTIME -DFASTBITS -DDOS -DGNUCI486 -Wall -O2 -m486 -fomit-frame-pointer -funroll-all-loops -finline-functions -ffast-math
+DEST=amp11.exe
+L=gxx
+endif
+
+vpath %.cpp binfile
+vpath %.h binfile
+
+CXXFLAGS=$(TARGETFLAGS) -Ibinfile
+OBJECTS=amp11.o mpgsplit.o ampdec.o amp1dec.o amp2dec.o amp3dec.o ampsynth.o binfile.o binfstd.o binfarc.o binfplwv.o binftcp.o binfhttp.o binfcon.o $(TARGETOBJS)
+
+
+$(DEST): $(OBJECTS)
+	@echo $@
+	@$(L) $(LFLAGS) $(OBJECTS) -o $(DEST)
+
+%.o: %.cpp
+	@echo $@
+	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+amp11.o: ampdec.h mpgsplit.h binfile.h binfstd.h binfarc.h binfplwv.h binfhttp.h $(TARGETDEPS)
+
+binfile.o: binfile.h
+binfstd.o: binfstd.h
+binfarc.o: binfarc.h
+binfplwv.o: binfplwv.h
+binfpllx.o: binfpllx.h
+binftcp.o: binftcp.h
+binfhttp.o: binfhttp.h
+binfcon.o: binfcon.h
+binfile.h: ptypes.h
+binfstd.h: binfile.h
+binfarc.h: binfile.h
+binfplwv.h: binfile.h
+binfpllx.h: binfile.h
+binftcp.h: binfile.h
+binfhttp.h: binftcp.h
+binfcon.h: binfile.h
+
+mpgsplit.o: mpgsplit.h
+ampdec.o: ampdec.h
+amp1dec.o: ampdec.h
+amp2dec.o: ampdec.h
+amp3dec.o: ampdec.h
+ampsynth.o: ampdec.h
+mpgsplit.h: binfile.h
+ampdec.h: binfile.h
+
+clean:
+	@rm -f *.o *~ $(DEST)

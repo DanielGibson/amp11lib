@@ -1,0 +1,78 @@
+lsys=nt
+dest=amp11
+adebopt = /zd
+#ldebopt = all
+cdebopt = /d1
+
+.cpp: .;binfile
+
+defines = /DTIME /DMSIBM /DFDCTBEXT /DFDCTDEXT /DFASTBITS /i=binfile
+!ifeq lsys nt
+targetobjs=binfplnt.obj
+targetdefs=/DWIN32
+!endif
+!ifeq lsys dos4g
+targetobjs=timer.obj binfplsb.obj
+targetdefs=/DDOS
+!endif
+objects=amp11.obj mpgsplit.obj ampdec.obj ampsynth.obj ampsynwc.obj amp3decw.obj amp3dec.obj amp2dec.obj amp1dec.obj binfile.obj binfstd.obj binfarc.obj binfcon.obj binfilef.obj binfmem.obj binfplwv.obj binftcp.obj binfhttp.obj $(targetobjs)
+
+
+!ifdef libpath
+!ifneq libpath
+cwc11include=/i=$(libpath)
+!endif
+!endif
+copt=/oneatmrlbkhi+ /ei /s /5 /5r /fp3 /zp8 $(cwc11include) /bt=$(lsys) /fpi87 $(defines) $(targetdefs)
+aopt=/ml /m5
+lopt=eliminate stack=65536
+
+.silent
+.erase
+
+$(dest).exe: $(objects) $(libraries)
+  echo $@
+  %create $*.tmp
+  for %i in ($(ldebopt)) do %append $*.tmp debug %i
+  for %i in ($(objects)) do %append $*.tmp file %i
+  for %i in ($(libpath)) do %append $*.tmp libpath %i
+  for %i in ($(libraries)) do %append $*.tmp library %i
+  for %i in ($(lopt)) do %append $*.tmp option %i
+  %append $*.tmp option { quiet caseexact dosseg }
+  %append $*.tmp name $(dest)
+  %append $*.tmp system $(lsys)
+  wlink @$*.tmp
+  del $*.tmp
+
+.cpp.obj: .autodepend
+  echo $@
+  *wpp386 /zq $(copt) $(cdebopt) $<
+
+.asm.obj: .autodepend
+  echo $@
+  *wasm /zq $(defines) $(cdebopt) $<
+
+!ifdef libraries
+!ifneq libraries
+$(libraries):
+  %null
+!endif
+!endif
+
+clean: .symbolic
+  if exist $(dest).tmp del $(dest).tmp
+  if exist $(dest).map del $(dest).map
+  if exist $(dest).smp del $(dest).smp
+  for %i in ($(objects)) do if exist %i del %i
+
+cleanall: .symbolic
+  %make clean
+  if exist $(dest).exe del $(dest).exe
+  if exist *.bak for %i in (*.bak) do del %i
+
+ifdef libpath
+ifeq libpath
+.lib: $(libpath)
+endif
+endif
+
