@@ -29,6 +29,7 @@ extern "C"
  #include <netdb.h>
  #include <fcntl.h>
  #include <arpa/inet.h>
+ #include <netinet/in.h>
  #include <errno.h>
  #include <unistd.h>
 #ifdef ALPHA
@@ -344,7 +345,7 @@ binfilepos tcpbinfile::rawioctl(intm code, void *buf, binfilepos len)
 uint4 tcpbinfile::getlocaladdr()
 {
   sockaddr_in ad;
-  int l=sizeof(ad);
+  socklen_t l=sizeof(ad);
   if (getsockname(handle, (sockaddr *)&ad, &l))
     return 0;
   return ntohl(ad.sin_addr.s_addr);
@@ -353,7 +354,7 @@ uint4 tcpbinfile::getlocaladdr()
 uint2 tcpbinfile::getlocalport()
 {
   sockaddr_in ad;
-  int l=sizeof(ad);
+  socklen_t l=sizeof(ad);
   if (getsockname(handle, (sockaddr *)&ad, &l))
     return 0;
   return ntohs(ad.sin_port);
@@ -362,7 +363,7 @@ uint2 tcpbinfile::getlocalport()
 uint4 tcpbinfile::getremoteaddr()
 {
   sockaddr_in ad;
-  int l=sizeof(ad);
+  socklen_t l=sizeof(ad);
   if (getpeername(handle, (sockaddr *)&ad, &l))
     return 0;
   return ntohl(ad.sin_addr.s_addr);
@@ -371,7 +372,7 @@ uint4 tcpbinfile::getremoteaddr()
 uint2 tcpbinfile::getremoteport()
 {
   sockaddr_in ad;
-  int l=sizeof(ad);
+  socklen_t l=sizeof(ad);
   if (getpeername(handle, (sockaddr *)&ad, &l))
     return 0;
   return ntohs(ad.sin_port);
@@ -471,7 +472,7 @@ errstat tcplistener::open(uint2 port, intm conbuf)
 
   if (!port)
   {
-    int l=sizeof(l);
+    socklen_t l=sizeof(l);
     getsockname(handle, (sockaddr *)&ad, &l);
     port=ntohs(ad.sin_port);
   }
