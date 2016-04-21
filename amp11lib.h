@@ -11,7 +11,7 @@
     #define WINAPI  __stdcall
   #endif
 #else // not windows - don't need additional stuff in function sigs
-  #define AMP11LIB_API
+  #define AMP11LIB_API __attribute__((visibility("default"))) extern "C"
   #define WINAPI
 #endif // _WIN32
 
@@ -34,7 +34,7 @@ typedef float ALfloat;
 typedef ALsint32 ALhandle;
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif
 
 ////
@@ -107,5 +107,5 @@ AMP11LIB_API ALbool WINAPI alSetRedirection(ALhandle hSource, ALhandle hTarget);
 AMP11LIB_API ALhandle WINAPI alGetRedirection(ALhandle hSource);
 
 #ifdef __cplusplus
-} // extern "C"
+//} // extern "C"
 #endif

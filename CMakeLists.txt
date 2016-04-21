@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(amp11lib)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ffast-math -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -Wall")
 
 add_definitions(-DFASTBITS)
 add_definitions(-DTIME)
@@ -20,7 +20,7 @@ set(SOURCE_FILES
     binfile/binfile.cpp
     binfile/binfile.h
     binfile/binfilef.cpp
-    binfile/binfpllx.cpp
+    #binfile/binfpllx.cpp
     binfile/binfpllx.h
     binfile/binfplwv.cpp
     binfile/binfplwv.h

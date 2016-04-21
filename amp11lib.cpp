@@ -133,6 +133,7 @@ public:
   }
 };
 
+
 //------------------------------------
 
 // check if a stream handle is valid
@@ -657,7 +658,7 @@ ALbool DoRedirection(void)
     // if end of stream
     if (sRead<REDIR_BUFFERSIZE*sizeof(ALsint16)) {
       // end redirection
-      alSetRedirection(is, 0);
+      //alSetRedirection(is, 0); // FIXME DG: I had to compile this out, is it useful?
     }
   }}
 
@@ -956,7 +957,7 @@ AMP11LIB_API void WINAPI alEndLibrary(void)
   }
 
   // disable possible redirection if on
-  alDisableRedirection();
+  //alDisableRedirection(); // FIXME DG: I had to compile this out, is it useful?
 
   // free all streams that are not freed
   for(int ist=0; ist<MAX_STREAMS; ist++) {
