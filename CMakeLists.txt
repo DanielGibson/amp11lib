@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ffast-math -Wall")
 add_definitions(-DFASTBITS)
 add_definitions(-DTIME)
 add_definitions(-DUNIX)
+add_definitions(-DOSS)
 
 set(SOURCE_FILES
     binfile/binfarc.cpp
