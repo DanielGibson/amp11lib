@@ -6,7 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ffast-math -Wall")
 add_definitions(-DFASTBITS)
 add_definitions(-DTIME)
 add_definitions(-DUNIX)
+add_definitions(-DLINUX)
 add_definitions(-DOSS)
+add_definitions(-DAMP11LIB_EXPORTS)
 
 set(SOURCE_FILES
     binfile/binfarc.cpp
@@ -27,6 +29,8 @@ set(SOURCE_FILES
     binfile/binftcp.cpp
     binfile/binftcp.h
     binfile/ptypes.h
+    amp11lib.cpp
+    amp11lib.h
     amp1dec.cpp
     amp2dec.cpp
     amp3dec.cpp
@@ -36,4 +40,4 @@ set(SOURCE_FILES
     mpgsplit.cpp
     mpgsplit.h)
 
-add_executable(amp11lib ${SOURCE_FILES})
+add_library(amp11lib SHARED ${SOURCE_FILES})
