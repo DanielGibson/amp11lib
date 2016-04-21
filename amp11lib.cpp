@@ -22,18 +22,18 @@
 #endif
 
 #ifdef LINUX
-#include "binfpllx.h"
+#include "binfile/binfpllx.h"
 #endif
 
 #ifdef UNIX
 #include <glob.h>
 #endif
 
-#include "binfhttp.h"
-#include "binfstd.h"
-#include "binfarc.h"
-#include "binfplwv.h"
-#include "binfcon.h"
+#include "binfile/binfhttp.h"
+#include "binfile/binfstd.h"
+#include "binfile/binfarc.h"
+#include "binfile/binfplwv.h"
+#include "binfile/binfcon.h"
 #include "ampdec.h"
 #include "mpgsplit.h"
 
@@ -66,13 +66,13 @@ struct Stream {
   ALsint32 st_nReferences;                // reference counter
   StreamType st_stType;                   // type of the stream, or unused
   ALhandle st_ahSlaves[SLAVESPERSTREAM];  // slave streams referenced by this one
-  FLOAT st_fBytesPerSec;        // bytes per second for decoder streams (used for seeking)
+  float st_fBytesPerSec;        // bytes per second for decoder streams (used for seeking)
   union {     // holds pointer to the actual stream, NULL if unused
     binfile *st_binfile;
     sbinfile *st_sbinfile;
     httpbinfile *st_httpbinfile;
     ampegdecoder *st_ampegdecoder;
-    ntplaybinfile *st_ntplaybinfile;
+    //ntplaybinfile *st_ntplaybinfile;
     abinfile *st_abinfile;
   };
 };
@@ -117,7 +117,7 @@ void LeaveCS(void)
   LeaveCriticalSection(&_cs);
 }
 #else
-#error implement critical sections!
+//#error implement critical sections!
 #endif
 
 // wrapper class used for easy lock/unlock using critical sections
@@ -126,10 +126,10 @@ private:
   int dummy;    // not to be zero sized
 public:
   CriticalSection(void) {
-    EnterCS();
+    //EnterCS();
   }
   ~CriticalSection(void) {
-    LeaveCS();
+    //LeaveCS();
   }
 };
 
@@ -513,6 +513,7 @@ AMP11LIB_API ALbool WINAPI alGetMPXHeader(ALhandle hFile, ALsint32 *piLayer,
     *piLayer, *piVersion, *piFrequency, *pbStereo, *piRate);
 }
 
+#if 0
 // get descriptive name of a given player device
 AMP11LIB_API ALsize WINAPI alDescribePlayerDevice(ALsint32 iDevice,
     char *strNameBuffer, ALsize sizeNameBuffer)
@@ -555,6 +556,7 @@ AMP11LIB_API ALhandle WINAPI alOpenPlayer(ALsint32 iDevice, ALsint32 iFreq, ALbo
   // if all fine, return the handle
   return hStream;
 }
+#endif
 
 // close any open amp11 stream
 AMP11LIB_API void WINAPI alClose(ALhandle hStream)
@@ -678,6 +680,7 @@ ALbool DoRedirection(void)
   return ALtrue;
 }
 
+#if 0
 // timer id for the multimedia timer
 UINT uiTimerID = 0;
 ALbool _bRedirEnabled = ALfalse;
@@ -801,6 +804,7 @@ AMP11LIB_API ALhandle WINAPI alGetRedirection(ALhandle hSource)
 
   return _astStreams[hSource].st_ahSlaves[SLAVE_REDIR];
 }
+#endif
 
 // decoder control functions
 AMP11LIB_API void WINAPI alDecSetVolume(ALhandle hDecoder, ALfloat fVolume)
@@ -936,7 +940,7 @@ AMP11LIB_API void WINAPI alInitLibrary(void)
   _bLibraryInitialized = ALtrue;
 
   // initialize critical section
-  InitCS();
+  //InitCS();
 }
 
 // cleanup amp11lib when not needed anymore
@@ -974,12 +978,13 @@ AMP11LIB_API void WINAPI alEndLibrary(void)
 #endif
 
   // cleanup critical section
-  EndCS();
+  //EndCS();
 
   // mark as not initialized
   _bLibraryInitialized = ALfalse;
 }
 
+#if 0
 // standard dll entry/exit point
 BOOL WINAPI DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -1011,3 +1016,4 @@ BOOL WINAPI DllMain( HANDLE hModule,
 
   return TRUE;
 }
+#endif

@@ -2,12 +2,12 @@
 // Copyright (c) 1997-99 Niklas Beisert
 // See COPYING (GNU Library General Public License 2) for license
 
-#ifndef LINUX
-#error must compile for LINUX
+#ifndef OSS
+#error must compile for OSS
 #endif
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <linux/soundcard.h>
+#include <sys/soundcard.h>
 #include <string.h>
 #include <fcntl.h>
 #include "binfpllx.h"

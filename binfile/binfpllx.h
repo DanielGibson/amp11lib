@@ -1,5 +1,5 @@
-#ifndef LINUX
-#error must compile for LINUX
+#ifndef OSS
+#error must compile for OSS
 #endif
 
 #ifndef __LINUXPLAYBINFILE_H
