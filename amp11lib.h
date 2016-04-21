@@ -1,14 +1,21 @@
 
 // AMP11LIB_EXPORTS should be defined when compiling the DLL, and not defined otherwise
-#ifdef AMP11LIB_EXPORTS
-#define AMP11LIB_API extern "C" __declspec(dllexport)
-#else                                                
-#define AMP11LIB_API extern "C" __declspec(dllimport)
-#endif
+#ifdef _WIN32
+  #ifdef AMP11LIB_EXPORTS
+    #define AMP11LIB_API __declspec(dllexport)
+  #else
+    #define AMP11LIB_API __declspec(dllimport)
+  #endif
 
-#ifndef WINAPI
-  #define WINAPI  __stdcall
-#endif
+  #ifndef WINAPI
+    #define WINAPI  __stdcall
+  #endif
+#else // not windows - don't need additional stuff in function sigs
+  #define AMP11LIB_API
+  #define WINAPI
+#endif // _WIN32
+
+
 
 // general types used
 typedef signed char ALsint8;
@@ -25,6 +32,10 @@ typedef float ALfloat;
 
 // handle type for amp11 streams
 typedef ALsint32 ALhandle;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 ////
 // library init/end
@@ -95,3 +106,6 @@ AMP11LIB_API ALbool WINAPI alSetRedirection(ALhandle hSource, ALhandle hTarget);
 // get target stream for given source stream
 AMP11LIB_API ALhandle WINAPI alGetRedirection(ALhandle hSource);
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
