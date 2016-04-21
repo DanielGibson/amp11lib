@@ -1,7 +1,7 @@
 #ifndef __MPDECODE_H
 #define __MPDECODE_H
 
-#include "binfile.h"
+#include "binfile/binfile.h"
 
 #ifdef __WATCOMC__
 void __fistp(long &i, long double x);

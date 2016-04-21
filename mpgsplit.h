@@ -1,4 +1,4 @@
-#include "binfile.h"
+#include "binfile/binfile.h"
 
 class mpegsplitstream : public binfile
 {
