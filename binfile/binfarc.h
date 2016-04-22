@@ -21,7 +21,6 @@ public:
   virtual ~abinfile();
 
   int open(binfile &fil, binfilepos ofs, binfilepos len);
-  // inherit f
 };
 
 #endif

@@ -47,11 +47,6 @@ struct Stream {
 #define MAX_STREAMS 64
 static struct Stream _astStreams[MAX_STREAMS];
 
-#define MAX_REDIRTARGETS  8       // maximal number of different target streams
-#define REDIR_BUFFERSIZE  256     // buffer for mixing of one target
-// mixing buffers are here
-static ALsint16 _aBuffers[MAX_REDIRTARGETS][REDIR_BUFFERSIZE];
-
 // set between calls to alInitSystem() and alEndSystem()
 static ALbool _bLibraryInitialized = ALfalse;
 
@@ -382,89 +377,6 @@ AMP11LIB_API ALsize WINAPI alRead(ALhandle hStream, void *pvBuffer, ALsize size)
   }
 
   return _astStreams[hStream].st_binfile->read(pvBuffer, size);
-}
-
-// do one pass of redirection loop - return false if nothing to do
-ALbool DoRedirection(void)
-{
-  int aiTargets[MAX_STREAMS];
-  // mark all streams as not being targets
-  {for (int is=1; is<MAX_STREAMS; is++) {
-    aiTargets[is] = -1;
-  }}
-
-  // -- find which are targets    
-  // for each stream
-  int nTargets = 0;
-  {for (int is=1; is<MAX_STREAMS; is++) {
-    // if there is redirection target
-    int isTarget = _astStreams[is].st_ahSlaves[SLAVE_REDIR];
-    if (isTarget != 0) {
-      // if the target is not yet marked, 
-      // and has enough free space in the buffer
-      if (aiTargets[isTarget] == -1
-        &&_astStreams[isTarget].st_binfile->ioctl(binfile::ioctlwmax) 
-          >= REDIR_BUFFERSIZE*sizeof(ALsint16)) {
-        // mark it
-        aiTargets[isTarget] = nTargets;
-        nTargets++;
-      }
-    }
-  }}
-
-  // if there are none, or too many
-  if (nTargets==0 || nTargets>MAX_REDIRTARGETS) {
-    // nothing to do
-    return ALfalse;
-  }
-  
-  // clear all buffers that will be used for mixing
-  memset(_aBuffers, 0, nTargets*REDIR_BUFFERSIZE*sizeof(ALsint16));
-
-  // for each stream that has a target
-  {for (int is=1; is<MAX_STREAMS; is++) {
-    Stream &st = _astStreams[is];
-    if (st.st_ahSlaves[SLAVE_REDIR]==0) {
-      continue;
-    }
-    // get the target buffer
-    int iTarget = aiTargets[_astStreams[is].st_ahSlaves[SLAVE_REDIR]];
-    if (iTarget<0) {
-      continue;
-    }
-    // read from stream to it
-    ALsint16 buffer[REDIR_BUFFERSIZE];
-    ALsize sRead = alRead(is, buffer, REDIR_BUFFERSIZE*sizeof(ALsint16));
-    assert(sRead<=REDIR_BUFFERSIZE*sizeof(ALsint16));
-    assert(iTarget>=0 && iTarget<MAX_REDIRTARGETS);
-    // mix to target buffer
-    {for(ALsize i=0; i<sRead/(ALsize)sizeof(ALsint16); i++) {
-      _aBuffers[iTarget][i]+=buffer[i];
-    }}
-    // if end of stream
-    if (sRead<REDIR_BUFFERSIZE*sizeof(ALsint16)) {
-      // end redirection
-      //alSetRedirection(is, 0); // FIXME DG: I had to compile this out, is it useful?
-    }
-  }}
-
-  // for each target stream
-  {for (int is=1; is<MAX_STREAMS; is++) {
-    int iTarget = aiTargets[is];
-    if (iTarget==-1) {
-      continue;
-    }
-    Stream &st = _astStreams[is];
-
-    // if still valid stream
-    if (st.st_stType!=ST_UNUSED) {
-      // write its buffer out
-      alWrite(is, _aBuffers[iTarget], REDIR_BUFFERSIZE*sizeof(ALsint16));
-    }
-  }}
-
-  // done something
-  return ALtrue;
 }
 
 AMP11LIB_API void WINAPI alDecSeekAbs(ALhandle hDecoder, ALfloat fSeconds)
